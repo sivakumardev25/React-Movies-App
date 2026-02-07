@@ -6,7 +6,7 @@ import SearchBar from "./components/SearchBar";
 import FilterDropdown from "./components/FilterDropdown";
 import MovieDetail from "./components/MovieDetail";
 import MovieList from "./components/MovieList";
-import Favourite from "./components/Favourite";
+// import Favourite from "./components/Favourite";
 
 import { SearchMovie } from "./api";
 
@@ -15,7 +15,7 @@ function App() {
   const [error, setError] = useState(null); //eeror message during the api call
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState(""); //filter applied to movie list
-  const [favourite, setFavourite] = useState([]);
+  // const [favourite, setFavourite] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   // const [hasSearched, setHasSearched] = useState(false);
