@@ -6,7 +6,7 @@ function MovieDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [movie, SetMovie] = useState(null); //store the fetch movie details
-  const [error, setError] = useState(null); //handle the error when fetched data
+  const [error, setError] = useState(""); //handle the error when fetched data
 
   // fetch the movieDeatils from the api
 
@@ -26,7 +26,7 @@ function MovieDetail() {
   if (!movie) {
     return (
       <div>
-        <h1 className="text-3xl font-bold text-red-600 leading-relaxed font-[Georgia]">
+        <h1 className="text-3xl font-bold text-gray-800 leading-relaxed font-[Georgia] text-center mt-10">
           Data is Loading... Please wait
         </h1>
       </div>
@@ -38,7 +38,7 @@ function MovieDetail() {
 
   return (
     <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-6 flex flex-col md:flex-row gap-6 bg-gradient-to-r from-teal-700 via-teal-400 to-teal-500">
-     {/* go back button */}
+      {/* go back button */}
       <span>
         <button
           onClick={() => navigate(-1)}
@@ -47,7 +47,7 @@ function MovieDetail() {
           Go Back
         </button>
       </span>
-     {/* movie poster */}
+      {/* movie poster */}
       <img
         src={
           movie.Poster !== "N/A"
@@ -57,7 +57,7 @@ function MovieDetail() {
         alt={movie.Title}
         className="w-72 rounded-lg shadow-md mx-auto md:mx-0"
       />
-     {/* movie details */}
+      {/* movie details */}
       <div className="mt-4 ms-4 flex-1">
         <h1 className="text-4xl font-bold text-gray-800 font-serif mb-5">
           {movie.Title}

@@ -2,6 +2,7 @@ import "./App.css";
 import { useState, useEffect, useCallback } from "react";
 import { Route, Routes, Link, useLocation } from "react-router-dom";
 
+import { SearchMovie } from "./api";
 import SearchBar from "./components/SearchBar";
 import FilterDropdown from "./components/FilterDropdown";
 import MovieDetail from "./components/MovieDetail";
@@ -9,11 +10,10 @@ import MovieList from "./components/MovieList";
 import Pagination from "./components/Pagination";
 // import Favourite from "./components/Favourite";
 
-import { SearchMovie } from "./api";
-
 function App() {
   const [movies, setMovies] = useState([]); //state to store the movies fetch the Api
-  const [error, setError] = useState(null); //eeror message during the api call
+  const [totalResults, setTotalResults] = useState(0);
+  const [error, setError] = useState(""); //eeror message during the api call
   const [loading, setLoading] = useState(true);
 
   const [filter, setFilter] = useState(""); //filter applied to movie list
@@ -24,22 +24,31 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const isDetailPage = useLocation().pathname.startsWith("/movie/");
 
-  const moviesPerPage = 5;
+  // const moviesPerPage = 5;
 
   // handleSearch
-  const handleSearch = useCallback(
-    async (searchTerm, userSearch = true) => {
+  const fetchMovies = useCallback(
+    async (term, page = 1, userSearch = false) => {
       try {
         setLoading(true);
 
         if (userSearch) {
           setIsSearched(true);
-          setSearchTerm(searchTerm);
+          setSearchTerm(term);
+          setCurrentPage(1);
+          page = 1; // reset to first page for new search
         }
 
-        const data = await SearchMovie(searchTerm, filter);
+        const data = await SearchMovie(term || "Movies", filter, page);
+
+        if (data.Response === "False") {
+          setMovies([]);
+          setTotalResults(0);
+          return;
+        }
+
         setMovies(data.Search || []);
-        setCurrentPage(1);
+        setTotalResults(Number(data.totalResults) || 0);
       } catch (error) {
         setError("Error fetching movies:", error);
       } finally {
@@ -51,17 +60,24 @@ function App() {
 
   // load default movies by calling the handleSearch
   useEffect(() => {
-    const loadDefaultMovies = async () => {
-      await handleSearch("Movies");
-    };
-    loadDefaultMovies();
-  }, [handleSearch]);
+    fetchMovies(searchTerm || "Movies", currentPage);
+  }, [searchTerm, currentPage, fetchMovies]);
+
+  // Handle Search
+  const handleSearch = (term) => {
+    fetchMovies(term, 1, true);
+  };
 
   // filter the movies
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
-    handleSearch(searchTerm || "Movies", false);
+    setCurrentPage(1);
+    // handleSearch(searchTerm || "Movies", false);
   };
+
+  //Handle Pagination
+  // const totalPages = Math.ceil(movies.length / moviesPerPage);
+  const totalPages = Math.max(1, Math.ceil(totalResults / 10));
 
   // update the current page state when pagination button is clicked
   const handlePagination = (pageNumber) => {
@@ -70,25 +86,23 @@ function App() {
   };
 
   // calculate the current movies to dispaly
-  const indexOfLastMovie = currentPage * moviesPerPage;
-  const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
-  const currentMovies = movies.slice(indexOfFirstMovie, indexOfLastMovie);
-
-  //display total page
-  // const totalPages = Math.ceil(movies.length / moviesPerPage);
-  const totalPages = Math.max(1, Math.ceil(movies.length / moviesPerPage));
+  // const indexOfLastMovie = currentPage * moviesPerPage;
+  // const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
+  // const currentMovies = movies;
+  // const currentMovies = movies.slice(indexOfFirstMovie, indexOfLastMovie);
 
   //contains all the page numbers for the pagination button
-  const paginationNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    paginationNumbers.push(i);
-  }
+  // const paginationNumbers = [];
+  // for (let i = 1; i <= totalPages; i++) {
+  //   paginationNumbers.push(i);
+  // }
 
   // condition if data is loading
+
   if (loading) {
     return (
-      <h1 className="text-4xl font-bold text-red-600 font-[Georgia]">
-        Data is loading Please wait......
+      <h1 className="text-2xl font-semibold text-gray-700 text-center font-[Georgia] mt-10">
+        🎬 Loading Movies Please wait...
       </h1>
     );
   }
@@ -101,7 +115,8 @@ function App() {
   return (
     <>
       {/* header */}
-      <header className="sticky top-0 bg-gray-400 backdrop-blur-md shadow-md  bg-gradient-to-r from-rose-200 via-violet-500 to-blue-400 items-center flex flex-wrap gap-5 justify-between p-5 mb-10 z-50">
+      <header className="sticky top-0 bg-gray-400 backdrop-blur-md shadow-md font-bold bg-gradient-to-r from-rose-200 via-violet-500 to-blue-400 items-center flex flex-wrap gap-5 justify-between p-5 mb-10 z-50">
+        {/* bg-gradient-to-r from-yellow-300 via-pink-400 to-purple-400 */}
         <Link
           to="/"
           className="text-3xl md:text-4xl font-extrabold text-gray-800 "
@@ -127,7 +142,7 @@ function App() {
                       onClick={() => {
                         setIsSearched(false);
                         setSearchTerm("");
-                        handleSearch("movies", false);
+                        handleSearch("movies", 1);
                       }}
                       className="mb-4 px-4 py-2 bg-gray-600 text-white rounded"
                     >
@@ -135,7 +150,7 @@ function App() {
                     </button>
                   )}
 
-                  <MovieList movies={currentMovies} />
+                  <MovieList movies={movies} />
 
                   {/* Pagination */}
                   <Pagination
@@ -153,5 +168,4 @@ function App() {
     </>
   );
 }
-
 export default App;

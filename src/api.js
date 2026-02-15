@@ -4,15 +4,16 @@ const API_KEY = "d8048d46";
 const API_URL = "https://www.omdbapi.com/";
 
 // function to search movies based on the search term and type (movie, series, episode)
-export const SearchMovie = async (searchTerm, type = "") => {
+export const SearchMovie = async (searchTerm, type = "", page = 1) => {
   try {
     const response = await axios.get(
-      `${API_URL}?s=${searchTerm}&type=${type}&apikey=${API_KEY}`,
+      `${API_URL}?s=${searchTerm}&type=${type}&page=${page}&apikey=${API_KEY}`,
     );
     return response.data;
   } catch (error) {
     console.log("Error fetching movies:", error);
-    return searchTerm ? { Search: [] } : [];
+    return { Search: [], totalResults: 0 };
+    // return searchTerm ? { Search: [] } : [];
   }
 };
 

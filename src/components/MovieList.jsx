@@ -14,9 +14,8 @@ function MovieList({ movies }) {
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 ">
       {movies.map((movie) => (
         <Link key={movie.imdbID} to={`/movie/${movie.imdbID}`}>
-        {/* card for each movie */}
+          {/* card for each movie */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-2xl transform hover:-translate-y-1 transition duration-300">
-        
             <img
               src={
                 movie.Poster !== "N/A"
@@ -24,7 +23,7 @@ function MovieList({ movies }) {
                   : "https://via.placeholder.com/300x450"
               }
               alt={movie.Title}
-              className="w-full h-96 object-fit"
+              className="w-full h-96 object-cover"
             />
 
             <div className="bg-gradient-to-r from-violet-300 via-sky-600 to-violet-700 text-center p-4">
